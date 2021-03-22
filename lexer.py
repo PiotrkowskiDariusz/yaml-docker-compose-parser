@@ -14,15 +14,17 @@ class Lexer:
 
     def tokenize(self, input_string):
         keywords = {'version', 'services', 'build', 'ports', 'image', 'volumes', 'environment', 'deploy', 'EOF',
-                    'networks', 'endpoint_mode'}
+                    'networks', 'environment'}
 
         token_specification = [
-            ('ASSIGN', r': '),  # Assignment operator (colon)
-            ('LIST_INDICATOR', r'-'),  # Indicates a list
+            ('ASSIGN', r'(: )|(:(?!.))'),  # Assignment operator (colon)
+            # ('ID', r'([A-Za-z]+)|(^"$"[A-Za-z]+)|(\d+(\.\d*)?)|("(?:[^"\\]|\\.)*")')
             ('NEWLINE', r'\n'),  # Line endings and statement terminator
-            ('INDENTATION', r'[ {2}|\t]'),  # Tab or 2 spaces
-            ('SPACE', r' +'), # spaces
-            ('ID', r'(([A-Za-z]|(-)|(\d)|(\/)|(_))+)|(^"$"[A-Za-z]+)|(\d+(\.\d*)?)|("(?:[^"\\]|\\.)*")')
+            # ('INDENTATION', r'[( {2}|\t)]'),  # Tab or 2 spaces
+            ('INDENTATION', r'(( {2}|\t))'),  # Tab or 2 spaces
+            ('LIST_ELEMENT', r'( - )|( -)|(- )|(-)'),  # Indicates a list
+            ('SPACE', r' +'),  # spaces
+            ('ID', r'(([A-Za-z]|(-)|(\d)|(\/)|(:(?! |\n))|(_))+)|(^"$"[A-Za-z]+)|(\d+(\.\d*)?)|("(?:[^"\\]|\\.)*")'),
         ]
         tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
         get_token = re.compile(tok_regex).match
@@ -44,7 +46,7 @@ class Lexer:
             current_position = match.end()
             match = get_token(input_string, current_position)
         if current_position != len(input_string):
-            raise RuntimeError('Error: Unexpected character %r on line %d' % \
+            raise RuntimeError('Error: Unexpected character %r on line %d' %
                                (input_string[current_position], line_number))
         yield Token('EOF', '', line_number, current_position - line_start)
 

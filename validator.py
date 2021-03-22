@@ -1,23 +1,15 @@
-from lexer import *
+# Simple example of parsing
+# Bartosz Sawicki, 2014-03-13
+
+#from scanner import *
 from myparser import *
+from lexer import *
 
-# input_string = '''
-# x := 5;
-# y := x;
-# PRINT 64;
-# '''
-
-input_string = '''
- PRINT x;
-    IF quantity THEN
-        total := total;
-        tax := 0.05;
-    ENDIF;
-'''
-
+f = open("compose.yaml", "r")
+input_string = f.read()
+f.close()
 print(input_string)
 lexer = Lexer(input_string)
-print(lexer.tokens)
 
 parser = Parser(lexer)
 parser.start()
