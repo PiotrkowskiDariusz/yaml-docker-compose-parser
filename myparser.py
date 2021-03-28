@@ -9,12 +9,12 @@ class Parser:
 
     def take_token(self, token_type):
         if self.token.type != token_type:
-            self.error("Unexpected token: " + self.token.type)
+            self.error("unexpected token: " + self.token.type)
         if token_type != 'EOF':
             self.token = self.next_token()
 
     def error(self, msg):
-        raise RuntimeError('Parser error, %s' % msg)
+        raise RuntimeError('Parser error, line ' + str(self.token.line) + ", " + msg)
 
     ##### Parser body #####
 
